@@ -172,6 +172,19 @@ def nudge_llm():
         cta = {"label": "Create Weekend Pot ($50)", "action": "create_pot", "amount": 50}
     return jsonify({"persona": persona, "message": message, "cta": cta})
 
+# New API endpoint using Ollama model
+@app.get("/api/noetllm")
+def noet_llm():
+    prompt = request.args.get('prompt')
+    if not prompt:
+        return jsonify({"error": "Prompt is required"}), 400
+
+    try:
+        result = llm(prompt)
+        return jsonify({"result": result.strip()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5057, debug=True)
