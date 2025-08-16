@@ -3,4 +3,5 @@ flask-cors==4.0.1
 python-dateutil==2.9.0
 langchain==0.2.10
 langchain-openai==0.1.21
+langchain-community
 openai

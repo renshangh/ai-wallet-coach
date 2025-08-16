@@ -123,37 +123,45 @@ def accept_nudge():
 def yield_alts():
     return jsonify({"alternatives": SAFE_ALT_POOLS})
 
-# -------- LangChain LLM (Ollama Qwen2.5) --------
-import os
-print("Loading Ollama local model for LLM nudges...")
-try:
-    from langchain_community.llms import Ollama
-    from langchain.prompts import ChatPromptTemplate
-    llm = Ollama(model="qwen2.5-coder:7b-instruct-q8_0", temperature=0.7)
-    print("Using LLM for coaching nudges, llm.model: ", llm.model)
 
-    # Define the prompt template for the LLM nudge
-    nudge_prompt = ChatPromptTemplate.from_template(
-        "You are an encouraging, concise AI wallet coach.\n"
-        "Persona: {persona}\n"
-        "Recent transactions (ISO ts, amount, category): {txns}\n"
-        "Constraints: 1-2 sentences, friendly, specific, never give financial advice, say 'guidance' not 'advice'.\n"
-        "End with a short actionable suggestion."
-    )
-    def llm_nudge(persona, txns):
-        result = (nudge_prompt | llm).invoke({
-            "persona": persona,
-            "txns": txns[-6:]
-        })
-        if isinstance(result, str):
-            return result.strip()
-        elif hasattr(result, "content"):
-            return result.content.strip()
-        else:
-            return str(result)
+# -------- LangChain LLM (optional) --------
+# To enable, set OPENAI_API_KEY in your env. Falls back to static text if not set.
+import os
+print("Loading OpenAI API key from environment...")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+print("OPENAI_API_KEY set: ", OPENAI_API_KEY)
+try:
+    if OPENAI_API_KEY:
+        from langchain_openai import ChatOpenAI
+        from langchain.prompts import ChatPromptTemplate
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+        print("Using LLM for coaching nudges, llm.model: ", llm.model_name)
+
+        # Define the prompt template for the LLM nudge
+        nudge_prompt = ChatPromptTemplate.from_template(
+            "You are an encouraging, concise AI wallet coach.\n"
+            "Persona: {persona}\n"
+            "Recent transactions (ISO ts, amount, category): {txns}\n"
+            "Constraints: 1-2 sentences, friendly, specific, never give financial advice, say 'guidance' not 'advice'.\n"
+            "End with a short actionable suggestion."
+        )
+        def llm_nudge(persona, txns):
+            result = (nudge_prompt | llm).invoke({
+                "persona": persona,
+                "txns": txns[-6:]
+            })
+            if isinstance(result.content, str):
+                return result.content.strip()
+            else:
+                return result.content
+    else:
+        def llm_nudge(persona, txns):
+            # fallback for hackathon demos without API key
+            return f"As your {persona} coach: you’re trending high on weekend spend. Try moving $50 to a Weekend Pot today."
 except Exception as e:
     def llm_nudge(persona, txns):
         return "Coach temporarily unavailable; using heuristic nudges. Try setting aside $50 for the weekend and review DeFi allocations."
+
 
 
 @app.get("/api/nudge/llm")
