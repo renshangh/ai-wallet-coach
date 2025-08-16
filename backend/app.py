@@ -127,12 +127,17 @@ def yield_alts():
 # -------- LangChain LLM (optional) --------
 # To enable, set OPENAI_API_KEY in your env. Falls back to static text if not set.
 import os
+print("Loading OpenAI API key from environment...")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+print("OPENAI_API_KEY set: ", OPENAI_API_KEY)
 try:
     if OPENAI_API_KEY:
         from langchain_openai import ChatOpenAI
         from langchain.prompts import ChatPromptTemplate
         llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+        print("Using LLM for coaching nudges, llm.model: ", llm.model_name)
+
+        # Define the prompt template for the LLM nudge
         nudge_prompt = ChatPromptTemplate.from_template(
             "You are an encouraging, concise AI wallet coach.\n"
             "Persona: {persona}\n"
@@ -145,7 +150,10 @@ try:
                 "persona": persona,
                 "txns": txns[-6:]
             })
-            return result.content.strip()
+            if isinstance(result.content, str):
+                return result.content.strip()
+            else:
+                return result.content
     else:
         def llm_nudge(persona, txns):
             # fallback for hackathon demos without API key
@@ -158,6 +166,7 @@ except Exception as e:
 
 @app.get("/api/nudge/llm")
 def nudge_llm():
+    print("Generating LLM nudge...")
     persona = persona_infer()
     # Summarize recent transactions for the prompt
     recent = [{
