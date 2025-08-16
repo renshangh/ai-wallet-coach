@@ -1,6 +1,6 @@
 # AI Wallet Coach – POC (React + Flask)
 
-A hackathon-ready proof-of-concept demonstrating an **AI Wallet Coach** that learns user behavior (via Noetic ID), provides **personalized nudges**, and flags **DeFi risk**. Uses synthetic data for safe demos.
+yes. A hackathon-ready proof-of-concept demonstrating an **AI Wallet Coach** that learns user behavior (via Noetic ID), provides **personalized nudges**, and flags **DeFi risk**. Uses synthetic data for safe demos.
 
 ## 📦 Structure
 ```
