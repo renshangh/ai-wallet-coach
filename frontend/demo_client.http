@@ -1,0 +1,13 @@
+@baseUrl = http://192.168.15.56:5057/
+
+### first request
+# @api/noetllm
+GET {{baseUrl}}/api/noetllm?prompt=What+can+you+do? 
+
+
+### second request
+# @api/profile
+GET {{baseUrl}}/api/profile
+
+
+

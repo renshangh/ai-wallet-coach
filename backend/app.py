@@ -14,7 +14,26 @@ USER = {
     "persona": None  # inferred below
 }
 
-TXNS = [
+# make a mcp call to get current expenses from the mock server 
+import requests
+# Define the URL of the REST API endpoint
+url = 'http://localhost:8000/mcp/credit/transactions/recent'
+
+# Make a GET request to the API
+response = requests.get(url)
+
+TXNS=[]
+
+# Check if the request was successful
+if response.status_code == 200:
+    # Parse the JSON response
+    TXNS = response.json()
+    #print("from json\n",TXNS)
+else:
+    print(f"Failed to retrieve data. Status code: {response.status_code}")
+
+
+"""TXNS = [
     # fiat-like spend
     {"ts": "2025-07-04T19:22:00Z", "type": "card", "merchant": "DoorDash", "amount": -38.20, "category": "Food"},
     {"ts": "2025-07-05T22:14:00Z", "type": "card", "merchant": "Target", "amount": -92.51, "category": "Shopping"},
@@ -31,8 +50,8 @@ TXNS = [
     {"ts": "2025-07-27T10:20:00Z", "type": "defi", "merchant": "AnonYield9000", "amount": 4.00, "category": "DeFi:Rewards"},
     # weekend spend spike
     {"ts": "2025-08-02T23:50:00Z", "type": "card", "merchant": "Best Buy", "amount": -289.99, "category": "Electronics"},
-    {"ts": "2025-08-03T00:35:00Z", "type": "card", "merchant": "Bars & Pubs", "amount": -63.40, "category": "Nightlife"},
-]
+    {"ts": "2025-08-03T00:35:00Z", "type": "card", "merchant": "Bars & Pubs", "amount": -63.40, "category": "Nightlife"} 
+] """
 
 SAFE_ALT_POOLS = [
     {"name": "Lido stETH", "apy": 4.1, "audited": True, "chain": "Ethereum"},
@@ -129,7 +148,7 @@ print("Loading Ollama local model for LLM nudges...")
 try:
     from langchain_community.llms import Ollama
     from langchain.prompts import ChatPromptTemplate
-    llm = Ollama(model="qwen2.5-coder:7b-instruct-q8_0", temperature=0.7)
+    llm = Ollama(model="qwen2.5-coder:7b-instruct-q8_0", temperature=0.0)
     print("Using LLM for coaching nudges, llm.model: ", llm.model)
 
     # Define the prompt template for the LLM nudge
