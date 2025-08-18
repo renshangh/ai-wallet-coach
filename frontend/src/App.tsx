@@ -29,7 +29,7 @@ export default function App() {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">AI Wallet Coach</h1>
+        <h1 className="text-2xl font-bold">Noetic AI Wallet</h1>
         <div className="text-sm">Noetic ID: <span className="font-mono">{profile.noetic_id}</span></div>
       </header>
 
